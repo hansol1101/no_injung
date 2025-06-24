@@ -1,6 +1,7 @@
 server:
   port: 8080
 spring:
+  redis:
   dotenv:
     location: .env.local.local
   datasource:

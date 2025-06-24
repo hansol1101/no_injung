@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SignUpRequest {
+public class SignUpRequest { //email, password, nickname api 전송
 
     private String email;
 
