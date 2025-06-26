@@ -1,6 +1,8 @@
 package com.ohgiraffers.no_injung.auth.jwt;
 
+import com.ohgiraffers.no_injung.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -8,14 +10,15 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
     private final String email;
+    private final User user;
 
     public CustomUserDetails(String email) {
-        this.email = email;
+        this.email = email; this.user = null;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // 권한 사용 안 하는 경우
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override

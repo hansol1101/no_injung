@@ -9,10 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider {//JWT 생성/검증/파싱 담당
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -59,5 +60,15 @@ public class JwtTokenProvider {
         String bearer = request.getHeader("Authorization");
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
+
+    public long getExpiration(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .getTime() - System.currentTimeMillis();
+    }
+
 
 }
