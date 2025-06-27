@@ -22,7 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class GameService {
+public class    GameService {
 
     private final GameSessionRepository gameSessionRepository;
     private final GameResultRepository gameResultRepository;

@@ -1,6 +1,5 @@
 package com.ohgiraffers.no_injung.auth.jwt;
 
-import com.ohgiraffers.no_injung.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,15 +9,16 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
     private final String email;
-    private final User user;
+    private final String role;
 
-    public CustomUserDetails(String email) {
-        this.email = email; this.user = null;
+    public CustomUserDetails(String email, String role) {
+        this.email = email;
+        this.role = role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
@@ -50,5 +50,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }
