@@ -6,8 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 사용자 엔티티 - 최소화 버전
- * 핵심 기능에 필요한 최소 컬럼만 포함
+ * 사용자 엔티티 - 권한 관리 포함
  */
 @Entity
 @Table(name = "users", indexes = {
@@ -23,11 +22,11 @@ public class User {
     
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
-    private String email; //로그인 아이디로 사용
+    private String email;
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
@@ -35,20 +34,21 @@ public class User {
     @Column(name = "nickname", nullable = false, unique = true, length = 50)
     private String nickname;
 
-    @Column(name = "create_at", nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @PrePersist
@@ -56,7 +56,9 @@ public class User {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.isDeleted = false;
-        this.role = Role.USER;
+        if (this.role == null) {
+            this.role = Role.USER; // 기본값은 USER
+        }
     }
 
     @PreUpdate

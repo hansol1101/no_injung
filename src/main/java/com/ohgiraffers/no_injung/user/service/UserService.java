@@ -1,8 +1,10 @@
 package com.ohgiraffers.no_injung.user.service;
 
 import com.ohgiraffers.no_injung.auth.Response.UserInfoResponse;
+import com.ohgiraffers.no_injung.user.dto.UserRegistrationDTO;
 import com.ohgiraffers.no_injung.user.dto.UserRequestDTO;
 import com.ohgiraffers.no_injung.user.dto.UserResponseDTO;
+import com.ohgiraffers.no_injung.user.entity.Role;
 import com.ohgiraffers.no_injung.user.entity.User;
 import com.ohgiraffers.no_injung.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +59,7 @@ public class UserService {
     }
 
     /**
-     * 사용자 정보 수정
+     * 사용자 정보 수정 (관리자용)
      */
     @Transactional
     public UserResponseDTO updateUser(Long userId, UserRequestDTO userRequestDTO) {
@@ -88,13 +90,17 @@ public class UserService {
         if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().trim().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         }
+        // 관리자만 Role 변경 가능
+        if (userRequestDTO.getRole() != null) {
+            user.setRole(userRequestDTO.getRole());
+        }
 
         User updatedUser = userRepository.save(user);
         return UserResponseDTO.fromEntity(updatedUser);
     }
 
     /**
-     * 내 정보 수정 (현재 로그인한 사용자) - 더 효율적인 방법
+     * 내 정보 수정 (현재 로그인한 사용자) - Role 변경 불가
      */
     @Transactional
     public UserResponseDTO updateMyInfo(UserDetails userDetails, UserRequestDTO userRequestDTO) {
@@ -119,7 +125,7 @@ public class UserService {
             throw new RuntimeException("이미 사용 중인 닉네임입니다: " + userRequestDTO.getNickname());
         }
 
-        // 필드 업데이트
+        // 필드 업데이트 (Role 제외 - 일반 사용자는 권한 변경 불가)
         if (userRequestDTO.getEmail() != null) {
             user.setEmail(userRequestDTO.getEmail());
         }
@@ -129,6 +135,7 @@ public class UserService {
         if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().trim().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         }
+        // 주의: 일반 사용자는 Role 변경 불가 (보안상 이유)
 
         User updatedUser = userRepository.save(user);
         return UserResponseDTO.fromEntity(updatedUser);
@@ -167,5 +174,33 @@ public class UserService {
      */
     public boolean existsById(Long userId) {
         return userRepository.findByUserIdAndIsDeletedFalse(userId).isPresent();
+    }
+
+    /**
+     * 새 계정 생성 (회원가입)
+     */
+    @Transactional
+    public UserResponseDTO createUser(UserRegistrationDTO registrationDTO) {
+        // 이메일 중복 체크
+        if (userRepository.existsByEmailAndIsDeletedFalse(registrationDTO.getEmail())) {
+            throw new RuntimeException("이미 사용 중인 이메일입니다: " + registrationDTO.getEmail());
+        }
+
+        // 닉네임 중복 체크
+        if (userRepository.existsByNicknameAndIsDeletedFalse(registrationDTO.getNickname())) {
+            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + registrationDTO.getNickname());
+        }
+
+        // 새 사용자 생성 (validation은 DTO 어노테이션에서 처리)
+        User newUser = User.builder()
+                .email(registrationDTO.getEmail())
+                .password(passwordEncoder.encode(registrationDTO.getPassword()))
+                .nickname(registrationDTO.getNickname())
+                .role(Role.USER) // 기본값은 USER
+                .build();
+
+        User savedUser = userRepository.save(newUser);
+
+        return UserResponseDTO.fromEntity(savedUser);
     }
 }

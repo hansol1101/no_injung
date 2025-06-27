@@ -4,9 +4,9 @@ spring:
   dotenv:
     location: .env
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3306/no_injung?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true # ${DB_URL}
+    username: root # ${DB_USERNAME}
+    password: 1234 # ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 2
@@ -22,3 +22,11 @@ jwt:
   access-token-expiration: 3600000 # 1 hour (ms)
   refresh-token-expiration: 604800000 # 7 days (ms)
   guest-token-expiration: 3600000 # 1 hour (ms)
+
+# 디버깅을 위한 로그 레벨 설정
+logging:
+  level:
+    com.ohgiraffers.no_injung: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG

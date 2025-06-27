@@ -1,5 +1,6 @@
 package com.ohgiraffers.no_injung.user.dto;
 
+import com.ohgiraffers.no_injung.user.entity.Role;
 import lombok.*;
 
 /**
@@ -17,6 +18,7 @@ public class UserRequestDTO {
     private String email;
     private String password;
     private String nickname;
+    private Role role; // 관리자만 수정 가능
 
     // 수정용 생성자 (비밀번호 제외)
     public UserRequestDTO(String email, String nickname) {
@@ -31,6 +33,7 @@ public class UserRequestDTO {
                 ", email='" + email + '\'' +
                 ", password='[PROTECTED]'" + // 보안상 비밀번호는 로그에 출력하지 않음
                 ", nickname='" + nickname + '\'' +
+                ", role=" + role +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.ohgiraffers.no_injung.user.dto;
 
+import com.ohgiraffers.no_injung.user.entity.Role;
 import com.ohgiraffers.no_injung.user.entity.User;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class UserResponseDTO {
     private Long userId;
     private String email;
     private String nickname;
+    private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -28,6 +30,7 @@ public class UserResponseDTO {
                 .userId(user.getUserId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
+                .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
