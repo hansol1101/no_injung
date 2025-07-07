@@ -1,10 +1,8 @@
 package com.ohgiraffers.no_injung.user.service;
 
-import com.ohgiraffers.no_injung.auth.Response.UserInfoResponse;
-import com.ohgiraffers.no_injung.user.dto.UserRegistrationDTO;
+import com.ohgiraffers.no_injung.auth.dto.UserInfoResponse;
 import com.ohgiraffers.no_injung.user.dto.UserRequestDTO;
 import com.ohgiraffers.no_injung.user.dto.UserResponseDTO;
-import com.ohgiraffers.no_injung.user.entity.Role;
 import com.ohgiraffers.no_injung.user.entity.User;
 import com.ohgiraffers.no_injung.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -174,33 +172,5 @@ public class UserService {
      */
     public boolean existsById(Long userId) {
         return userRepository.findByUserIdAndIsDeletedFalse(userId).isPresent();
-    }
-
-    /**
-     * 새 계정 생성 (회원가입)
-     */
-    @Transactional
-    public UserResponseDTO createUser(UserRegistrationDTO registrationDTO) {
-        // 이메일 중복 체크
-        if (userRepository.existsByEmailAndIsDeletedFalse(registrationDTO.getEmail())) {
-            throw new RuntimeException("이미 사용 중인 이메일입니다: " + registrationDTO.getEmail());
-        }
-
-        // 닉네임 중복 체크
-        if (userRepository.existsByNicknameAndIsDeletedFalse(registrationDTO.getNickname())) {
-            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + registrationDTO.getNickname());
-        }
-
-        // 새 사용자 생성 (validation은 DTO 어노테이션에서 처리)
-        User newUser = User.builder()
-                .email(registrationDTO.getEmail())
-                .password(passwordEncoder.encode(registrationDTO.getPassword()))
-                .nickname(registrationDTO.getNickname())
-                .role(Role.USER) // 기본값은 USER
-                .build();
-
-        User savedUser = userRepository.save(newUser);
-
-        return UserResponseDTO.fromEntity(savedUser);
     }
 }

@@ -1,14 +1,18 @@
-package com.ohgiraffers.no_injung.auth.Response;
+package com.ohgiraffers.no_injung.auth.dto;
 
 import com.ohgiraffers.no_injung.user.entity.Role;
 import com.ohgiraffers.no_injung.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
+/**
+ * 사용자 정보 응답 DTO
+ */
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserInfoResponse {
-
     private Long userId;
     private String email;
     private String nickname;

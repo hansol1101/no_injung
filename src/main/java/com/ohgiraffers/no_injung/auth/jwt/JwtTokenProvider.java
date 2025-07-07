@@ -24,8 +24,10 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
     
+    @Value("${jwt.access-token-expiration}")
+    private long tokenValidTime;
+    
     private final UserRepository userRepository;
-    private final long tokenValidTime = 1000L * 60 * 60; // 1시간
 
     /**
      * 사용자 정보로 JWT 토큰 생성 (Role 정보 포함)

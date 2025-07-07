@@ -17,9 +17,10 @@ import java.util.Map;
  * 통합 게임 API 컨트롤러
  * 4가지 게임의 공통 API 제공
  */
-@RestController
-@RequestMapping("/api/games")
+// @RestController
+// @RequestMapping("/api/games")
 @RequiredArgsConstructor
+// @Profile("!swagger-test") // 임시 비활성화
 public class GameController {
 
     private final GameService gameService;

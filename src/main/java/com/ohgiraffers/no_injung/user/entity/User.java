@@ -69,6 +69,5 @@ public class User {
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
         this.isDeleted = true;
-        this.updatedAt = LocalDateTime.now();
     }
 }
