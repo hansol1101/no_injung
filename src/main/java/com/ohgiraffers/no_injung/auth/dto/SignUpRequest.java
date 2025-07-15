@@ -1,9 +1,9 @@
 package com.ohgiraffers.no_injung.auth.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.time.LocalDate;
 
 /**
  * 회원가입 요청 DTO - 강화된 Validation 포함
@@ -29,12 +29,17 @@ public class SignUpRequest {
     @Size(min = 2, max = 50, message = "닉네임은 2자 이상 50자 이하여야 합니다.")
     private String nickname;
 
+    @NotNull(message = "생년월일은 필수 항목입니다.")
+    @Past(message = "생년월일은 현재 날짜보다 이전이어야 합니다.")
+    private LocalDate birthdate; //yyyy-MM-dd 형식으로 받음
+
     @Override
     public String toString() {
         return "SignUpRequest{" +
                 "email='" + email + '\'' +
                 ", password='[PROTECTED]'" + // 보안상 비밀번호는 로그에 출력하지 않음
                 ", nickname='" + nickname + '\'' +
+                ", birthDate=" + birthdate + // toString()에도 추가
                 '}';
     }
 }

@@ -40,10 +40,10 @@ public class AuthController {
      * 회원가입
      * 강화된 검증과 에러 처리 포함
      */
-    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다. 이메일과 닉네임 중복 검증을 포함합니다.")
+    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다. 이메일, 닉네임, 생년월일의 중복 검증을 포함합니다.")
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody SignUpRequest request) {
-        log.info("회원가입 요청: {}", request.getEmail());
+        log.info("회원가입 요청: {}", request.toString());
         
         try {
             authService.signup(request);
