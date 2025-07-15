@@ -3,6 +3,7 @@ package com.ohgiraffers.no_injung.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -33,6 +34,9 @@ public class User {
 
     @Column(name = "nickname", nullable = false, unique = true, length = 50)
     private String nickname;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate; //생년월일 필드 추가
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

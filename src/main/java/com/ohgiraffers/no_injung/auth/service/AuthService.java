@@ -58,6 +58,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
+                .birthDate(request.getBirthdate())
                 .role(Role.USER) // 기본 권한은 USER
                 .build();
 
