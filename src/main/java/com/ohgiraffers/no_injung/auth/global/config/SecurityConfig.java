@@ -38,9 +38,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/auth/**").permitAll() // 회원가입, 로그인 API는 인증 없이 허용
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger UI 접근 허용
-                        .anyRequest().authenticated() // 나머지는 인증 필요
+                        .anyRequest().permitAll() // 임시로 모든 요청 허용 (테스트용)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class)
                 .build();

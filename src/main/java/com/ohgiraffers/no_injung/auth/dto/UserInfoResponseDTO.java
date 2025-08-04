@@ -12,9 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserInfoResponseDTO {
-    private String nickname;
+    private String id;
 
     public UserInfoResponseDTO(User user) {
-        this.nickname = user.getNickname();
+        this.id = user.getNickname();
     }
 }

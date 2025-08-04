@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class UserResponseDTO {
     
     private Long userId;
-    private String nickname;
+    private String id;
     private LocalDate birthDate;
     private Role role;
     private LocalDateTime createdAt;
@@ -29,7 +29,7 @@ public class UserResponseDTO {
     public static UserResponseDTO fromEntity(User user) {
         return UserResponseDTO.builder()
                 .userId(user.getUserId())
-                .nickname(user.getNickname())
+                .id(user.getId())
                 .birthDate(user.getBirthDate())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())

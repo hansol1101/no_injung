@@ -12,6 +12,6 @@ import lombok.*;
 @Builder
 public class AuthResponse {
     private String token;
-    private String nickname; // 로그인용 아이디
+    private String id; // 로그인용 아이디
     private String role;
 }

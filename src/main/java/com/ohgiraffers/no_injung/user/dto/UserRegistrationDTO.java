@@ -27,14 +27,14 @@ public class UserRegistrationDTO {
 
     @NotBlank(message = "닉네임은 필수 항목입니다.")
     @Size(min = 2, max = 10, message = "닉네임은 2자 이상 10자 이하여야 합니다.")
-    private String nickname;
+    private String id;
 
     @Override
     public String toString() {
         return "UserRegistrationDTO{" +
                 "email='" + email + '\'' +
                 ", password='[PROTECTED]'" + // 보안상 비밀번호는 로그에 출력하지 않음
-                ", nickname='" + nickname + '\'' +
+                ", id='" + id + '\'' +
                 '}';
     }
 }

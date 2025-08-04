@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private final String nickname;
+    private final String id;
     private final String role;
 
-    public CustomUserDetails(String nickname, String role) {
-        this.nickname = nickname;
+    public CustomUserDetails(String id, String role) {
+        this.id = id;
         this.role = role;
     }
 
@@ -26,9 +26,16 @@ public class CustomUserDetails implements UserDetails {
         return null; // 비밀번호는 필요 없음 (JWT에서 인증 완료 상태)
     }
 
+    /**
+     * 사용자 아이디를 반환
+     */
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String getUsername() {
-        return nickname;
+        return id;
     }
 
     @Override

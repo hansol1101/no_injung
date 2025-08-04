@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(ssh:*)",
+      "Bash(chmod:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(ping:*)",
+      "Bash(cd:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(time curl:*)"
+    ],
+    "deny": []
+  }
+}

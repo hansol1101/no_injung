@@ -7,11 +7,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 사용자 엔티티 - 닉네임을 로그인용 아이디로 사용
+ * 사용자 엔티티 - 아이디를 로그인용 아이디로 사용
  */
 @Entity
 @Table(name = "users", indexes = {
-    @Index(name = "idx_nickname", columnList = "nickname")
+    @Index(name = "idx_id", columnList = "id")
 })
 @Getter
 @Setter
@@ -25,8 +25,8 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "nickname", nullable = false, unique = true, length = 50)
-    private String nickname; // 로그인용 아이디 역할
+    @Column(name = "id", nullable = false, unique = true, length = 50)
+    private String id; // 로그인용 아이디 역할
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;

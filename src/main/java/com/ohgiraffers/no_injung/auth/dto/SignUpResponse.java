@@ -13,6 +13,6 @@ import lombok.*;
 public class SignUpResponse {
     private Long id;
     private String email;
-    private String nickname;
+    private String userId;
     private String message;
 }
