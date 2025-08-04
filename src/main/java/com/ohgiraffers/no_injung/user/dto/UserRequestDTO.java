@@ -18,13 +18,13 @@ public class UserRequestDTO {
 
     private Long userId;
     private String password;
-    private String nickname;
+    private String id;
     private LocalDate birthDate;
     private Role role; // 관리자만 수정 가능
 
     // 수정용 생성자 (비밀번호 제외)
-    public UserRequestDTO(String nickname, LocalDate birthDate) {
-        this.nickname = nickname;
+    public UserRequestDTO(String id, LocalDate birthDate) {
+        this.id = id;
         this.birthDate = birthDate;
     }
 
@@ -33,7 +33,7 @@ public class UserRequestDTO {
         return "UserRequestDTO{" +
                 "userId=" + userId +
                 ", password='[PROTECTED]'" + // 보안상 비밀번호는 로그에 출력하지 않음
-                ", nickname='" + nickname + '\'' +
+                ", id='" + id + '\'' +
                 ", birthDate=" + birthDate +
                 ", role=" + role +
                 '}';

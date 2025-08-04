@@ -75,7 +75,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
-        user.setNickname(requestDTO.getNickname());
+        user.setNickname(requestDTO.getId());
         if (requestDTO.getBirthDate() != null) {
             user.setBirthDate(requestDTO.getBirthDate());
         }
@@ -107,7 +107,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
-        user.setNickname(requestDTO.getNickname());
+        user.setNickname(requestDTO.getId());
         if (requestDTO.getBirthDate() != null) {
             user.setBirthDate(requestDTO.getBirthDate());
         }
