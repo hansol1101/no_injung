@@ -7,11 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 사용자 엔티티 - 권한 관리 포함
+ * 사용자 엔티티 - 닉네임을 로그인용 아이디로 사용
  */
 @Entity
 @Table(name = "users", indexes = {
-    @Index(name = "idx_email", columnList = "email"),
     @Index(name = "idx_nickname", columnList = "nickname")
 })
 @Getter
@@ -26,14 +25,11 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "email", nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(name = "nickname", nullable = false, unique = true, length = 50)
+    private String nickname; // 로그인용 아이디 역할
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
-
-    @Column(name = "nickname", nullable = false, unique = true, length = 50)
-    private String nickname;
 
     @Column(name = "birth_date")
     private LocalDate birthDate; //생년월일 필드 추가

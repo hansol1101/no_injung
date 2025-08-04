@@ -14,13 +14,11 @@ import lombok.*;
 @Builder
 public class UserInfoResponse {
     private Long userId;
-    private String email;
     private String nickname;
     private Role role;
 
     public UserInfoResponse(User user) {
         this.userId = user.getUserId();
-        this.email = user.getEmail();
         this.nickname = user.getNickname();
         this.role = user.getRole();
     }

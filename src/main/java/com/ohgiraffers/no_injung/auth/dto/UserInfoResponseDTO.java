@@ -12,11 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserInfoResponseDTO {
-    private String email;
     private String nickname;
 
     public UserInfoResponseDTO(User user) {
-        this.email = user.getEmail();
         this.nickname = user.getNickname();
     }
 }
