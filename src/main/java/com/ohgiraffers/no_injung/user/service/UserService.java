@@ -30,7 +30,7 @@ public class UserService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByIdAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         return new UserInfoResponse(user);
@@ -64,10 +64,10 @@ public class UserService {
         User user = userRepository.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID: " + userId));
 
-        // 닉네임 중복 체크 (자신 제외)
-        if (!user.getNickname().equals(requestDTO.getNickname()) &&
-            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(requestDTO.getNickname(), userId)) {
-            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + requestDTO.getNickname());
+        // 아이디 중복 체크 (자신 제외)
+        if (!user.getId().equals(requestDTO.getId()) &&
+            userRepository.existsByIdAndUserIdNotAndIsDeletedFalse(requestDTO.getId(), userId)) {
+            throw new RuntimeException("이미 사용 중인 아이디입니다: " + requestDTO.getId());
         }
 
         // 비밀번호 변경 시 암호화
@@ -75,7 +75,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
-        user.setNickname(requestDTO.getId());
+        user.setId(requestDTO.getId());
         if (requestDTO.getBirthDate() != null) {
             user.setBirthDate(requestDTO.getBirthDate());
         }
@@ -93,13 +93,13 @@ public class UserService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByIdAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 닉네임 중복 체크 (자신 제외)
-        if (!user.getNickname().equals(requestDTO.getNickname()) &&
-            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(requestDTO.getNickname(), user.getUserId())) {
-            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + requestDTO.getNickname());
+        // 아이디 중복 체크 (자신 제외)
+        if (!user.getId().equals(requestDTO.getId()) &&
+            userRepository.existsByIdAndUserIdNotAndIsDeletedFalse(requestDTO.getId(), user.getUserId())) {
+            throw new RuntimeException("이미 사용 중인 아이디입니다: " + requestDTO.getId());
         }
 
         // 비밀번호 변경 시 암호화
@@ -107,7 +107,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
-        user.setNickname(requestDTO.getId());
+        user.setId(requestDTO.getId());
         if (requestDTO.getBirthDate() != null) {
             user.setBirthDate(requestDTO.getBirthDate());
         }
@@ -137,7 +137,7 @@ public class UserService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByIdAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         user.softDelete();

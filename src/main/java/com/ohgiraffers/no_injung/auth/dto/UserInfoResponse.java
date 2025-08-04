@@ -19,7 +19,7 @@ public class UserInfoResponse {
 
     public UserInfoResponse(User user) {
         this.userId = user.getUserId();
-        this.id = user.getNickname();
+        this.id = user.getId();
         this.role = user.getRole();
     }
 }
