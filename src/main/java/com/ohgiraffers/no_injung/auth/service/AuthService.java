@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 인증 서비스 - 강화된 로직
+ * 인증 서비스 - 닉네임을 로그인용 아이디로 사용
  * 회원가입, 로그인, 보안 검증 등을 담당
  */
 @Service
@@ -28,44 +28,37 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 회원가입 - 강화된 로직
-     * 1. 중복 검증 (이메일, 닉네임)
+     * 회원가입 - 닉네임을 로그인용 아이디로 사용
+     * 1. 닉네임 중복 검증
      * 2. 비밀번호 암호화
      * 3. 기본 권한 설정 (USER)
      * 4. 로그 기록
      */
     @Transactional
     public void signup(SignUpRequest request) {
-        log.info("=== 회원가입 시작: {} ===", request.getEmail());
+        log.info("=== 회원가입 시작: {} ===", request.getNickname());
 
-        // 1. 이메일 중복 검증 (논리삭제된 사용자 제외)
-        if (userRepository.existsByEmailAndIsDeletedFalse(request.getEmail())) {
-            log.warn("회원가입 실패 - 이메일 중복: {}", request.getEmail());
-            throw new RuntimeException("이미 사용 중인 이메일입니다: " + request.getEmail());
-        }
-
-        // 2. 닉네임 중복 검증 (논리삭제된 사용자 제외)
+        // 1. 닉네임 중복 검증 (논리삭제된 사용자 제외)
         if (userRepository.existsByNicknameAndIsDeletedFalse(request.getNickname())) {
             log.warn("회원가입 실패 - 닉네임 중복: {}", request.getNickname());
             throw new RuntimeException("이미 사용 중인 닉네임입니다: " + request.getNickname());
         }
 
-        // 3. 비밀번호 강도 검증 (추가 보안)
+        // 2. 비밀번호 강도 검증 (추가 보안)
         validatePasswordStrength(request.getPassword());
 
-        // 4. 사용자 엔티티 생성
+        // 3. 사용자 엔티티 생성
         User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .birthDate(request.getBirthdate())
                 .role(Role.USER) // 기본 권한은 USER
                 .build();
 
         try {
             User savedUser = userRepository.save(user);
-            log.info("회원가입 성공: ID={}, 이메일={}, 닉네임={}",
-                    savedUser.getUserId(), savedUser.getEmail(), savedUser.getNickname());
+            log.info("회원가입 성공: ID={}, 닉네임={}",
+                    savedUser.getUserId(), savedUser.getNickname());
         } catch (Exception e) {
             log.error("회원가입 실패 - DB 저장 오류: {}", e.getMessage(), e);
             throw new RuntimeException("회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -73,7 +66,7 @@ public class AuthService {
     }
 
     /**
-     * 로그인 - 강화된 로직
+     * 로그인 - 닉네임을 로그인용 아이디로 사용
      * 1. 사용자 존재 여부 확인 (논리삭제 제외)
      * 2. 비밀번호 검증
      * 3. JWT 토큰 생성 (Role 정보 포함)
@@ -81,28 +74,28 @@ public class AuthService {
      */
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        log.info("=== 로그인 시도: {} ===", request.getEmail());
+        log.info("=== 로그인 시도: {} ===", request.getNickname());
 
         // 1. 사용자 조회 (논리삭제되지 않은 사용자만)
-        User user = userRepository.findByEmailAndIsDeletedFalse(request.getEmail())
+        User user = userRepository.findByNicknameAndIsDeletedFalse(request.getNickname())
                 .orElseThrow(() -> {
-                    log.warn("로그인 실패 - 사용자 없음: {}", request.getEmail());
-                    return new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다.");
+                    log.warn("로그인 실패 - 사용자 없음: {}", request.getNickname());
+                    return new RuntimeException("닉네임 또는 비밀번호가 올바르지 않습니다.");
                 });
 
         // 2. 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            log.warn("로그인 실패 - 비밀번호 불일치: {}", request.getEmail());
-            throw new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            log.warn("로그인 실패 - 비밀번호 불일치: {}", request.getNickname());
+            throw new RuntimeException("닉네임 또는 비밀번호가 올바르지 않습니다.");
         }
 
         // 3. JWT 토큰 생성 (Role 정보 포함)
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getNickname());
 
-        log.info("로그인 성공: ID={}, 이메일={}, 권한={}",
-                user.getUserId(), user.getEmail(), user.getRole());
+        log.info("로그인 성공: ID={}, 닉네임={}, 권한={}",
+                user.getUserId(), user.getNickname(), user.getRole());
 
-        return new AuthResponse(token, user.getEmail(), user.getNickname(), user.getRole().name());
+        return new AuthResponse(token, user.getNickname(), user.getRole().name());
     }
 
     /**
@@ -138,17 +131,6 @@ public class AuthService {
     }
 
     /**
-     * 이메일 중복 확인 (공개 API용)
-     * 회원가입 폼에서 실시간 검증에 활용 가능
-     */
-    public boolean isEmailAvailable(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
-        }
-        return !userRepository.existsByEmailAndIsDeletedFalse(email.trim().toLowerCase());
-    }
-
-    /**
      * 닉네임 중복 확인 (공개 API용)
      * 회원가입 폼에서 실시간 검증에 활용 가능
      */
@@ -163,7 +145,7 @@ public class AuthService {
      * 사용자 활성 상태 확인
      * JWT 필터에서 활용 가능
      */
-    public boolean isUserActive(String email) {
-        return userRepository.findByEmailAndIsDeletedFalse(email).isPresent();
+    public boolean isUserActive(String nickname) {
+        return userRepository.findByNicknameAndIsDeletedFalse(nickname).isPresent();
     }
 }

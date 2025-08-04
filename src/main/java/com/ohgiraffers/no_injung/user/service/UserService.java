@@ -30,7 +30,7 @@ public class UserService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         return new UserInfoResponse(user);
@@ -50,109 +50,86 @@ public class UserService {
      * 전체 사용자 조회 (논리적 삭제 제외)
      */
     public List<UserResponseDTO> getAllUsers() {
-        List<User> users = userRepository.findAllByIsDeletedFalse();
-        return users.stream()
+        return userRepository.findAllByIsDeletedFalse()
+                .stream()
                 .map(UserResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
     /**
-     * 사용자 정보 수정 (관리자용)
+     * 사용자 정보 수정
      */
     @Transactional
-    public UserResponseDTO updateUser(Long userId, UserRequestDTO userRequestDTO) {
+    public UserResponseDTO updateUser(Long userId, UserRequestDTO requestDTO) {
         User user = userRepository.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID: " + userId));
 
-        // 이메일 중복 체크 (자신 제외)
-        if (userRequestDTO.getEmail() != null && 
-            !userRequestDTO.getEmail().equals(user.getEmail()) &&
-            userRepository.existsByEmailAndUserIdNotAndIsDeletedFalse(userRequestDTO.getEmail(), userId)) {
-            throw new RuntimeException("이미 사용 중인 이메일입니다: " + userRequestDTO.getEmail());
-        }
-
         // 닉네임 중복 체크 (자신 제외)
-        if (userRequestDTO.getNickname() != null && 
-            !userRequestDTO.getNickname().equals(user.getNickname()) &&
-            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(userRequestDTO.getNickname(), userId)) {
-            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + userRequestDTO.getNickname());
+        if (!user.getNickname().equals(requestDTO.getNickname()) &&
+            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(requestDTO.getNickname(), userId)) {
+            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + requestDTO.getNickname());
         }
 
-        // 필드 업데이트
-        if (userRequestDTO.getEmail() != null) {
-            user.setEmail(userRequestDTO.getEmail());
-        }
-        if (userRequestDTO.getNickname() != null) {
-            user.setNickname(userRequestDTO.getNickname());
-        }
-        if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().trim().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-        }
-        // 관리자만 Role 변경 가능
-        if (userRequestDTO.getRole() != null) {
-            user.setRole(userRequestDTO.getRole());
+        // 비밀번호 변경 시 암호화
+        if (requestDTO.getPassword() != null && !requestDTO.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
 
-        User updatedUser = userRepository.save(user);
-        return UserResponseDTO.fromEntity(updatedUser);
+        user.setNickname(requestDTO.getNickname());
+        if (requestDTO.getBirthDate() != null) {
+            user.setBirthDate(requestDTO.getBirthDate());
+        }
+
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromEntity(savedUser);
     }
 
     /**
-     * 내 정보 수정 (현재 로그인한 사용자) - Role 변경 불가
+     * 내 정보 수정 (현재 로그인한 사용자)
      */
     @Transactional
-    public UserResponseDTO updateMyInfo(UserDetails userDetails, UserRequestDTO userRequestDTO) {
+    public UserResponseDTO updateMyInfo(UserDetails userDetails, UserRequestDTO requestDTO) {
         if(userDetails == null){
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 이메일 중복 체크 (자신 제외)
-        if (userRequestDTO.getEmail() != null && 
-            !userRequestDTO.getEmail().equals(user.getEmail()) &&
-            userRepository.existsByEmailAndUserIdNotAndIsDeletedFalse(userRequestDTO.getEmail(), user.getUserId())) {
-            throw new RuntimeException("이미 사용 중인 이메일입니다: " + userRequestDTO.getEmail());
-        }
-
         // 닉네임 중복 체크 (자신 제외)
-        if (userRequestDTO.getNickname() != null && 
-            !userRequestDTO.getNickname().equals(user.getNickname()) &&
-            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(userRequestDTO.getNickname(), user.getUserId())) {
-            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + userRequestDTO.getNickname());
+        if (!user.getNickname().equals(requestDTO.getNickname()) &&
+            userRepository.existsByNicknameAndUserIdNotAndIsDeletedFalse(requestDTO.getNickname(), user.getUserId())) {
+            throw new RuntimeException("이미 사용 중인 닉네임입니다: " + requestDTO.getNickname());
         }
 
-        // 필드 업데이트 (Role 제외 - 일반 사용자는 권한 변경 불가)
-        if (userRequestDTO.getEmail() != null) {
-            user.setEmail(userRequestDTO.getEmail());
+        // 비밀번호 변경 시 암호화
+        if (requestDTO.getPassword() != null && !requestDTO.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
         }
-        if (userRequestDTO.getNickname() != null) {
-            user.setNickname(userRequestDTO.getNickname());
-        }
-        if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().trim().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-        }
-        // 주의: 일반 사용자는 Role 변경 불가 (보안상 이유)
 
-        User updatedUser = userRepository.save(user);
-        return UserResponseDTO.fromEntity(updatedUser);
+        user.setNickname(requestDTO.getNickname());
+        if (requestDTO.getBirthDate() != null) {
+            user.setBirthDate(requestDTO.getBirthDate());
+        }
+
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromEntity(savedUser);
     }
 
     /**
-     * 논리적 삭제
+     * 사용자 삭제 (논리적 삭제)
      */
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID: " + userId));
-
-        user.softDelete(); // Entity의 softDelete 메서드 사용
+        
+        user.softDelete();
         userRepository.save(user);
     }
 
     /**
-     * 논리적 삭제 - 현재 로그인한 사용자 (자기 자신)
+     * 내 계정 삭제 (논리적 삭제) - 현재 로그인한 사용자
      */
     @Transactional
     public void deleteMyAccount(UserDetails userDetails) {
@@ -160,7 +137,7 @@ public class UserService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        User user = userRepository.findByEmailAndIsDeletedFalse(userDetails.getUsername())
+        User user = userRepository.findByNicknameAndIsDeletedFalse(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         user.softDelete();

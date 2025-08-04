@@ -32,14 +32,14 @@ public class JwtTokenProvider {
     /**
      * 사용자 정보로 JWT 토큰 생성 (Role 정보 포함)
      */
-    public String createToken(String email) {
+    public String createToken(String nickname) {
         // 사용자 정보 조회하여 Role 가져오기
-        User user = userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
+        User user = userRepository.findByNicknameAndIsDeletedFalse(nickname)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + nickname));
         
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(nickname)
                 .claim("role", user.getRole().name()) // Role 정보 추가
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
@@ -47,7 +47,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getEmail(String token) {
+    public String getNickname(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -72,9 +72,9 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        String email = getEmail(token);
+        String nickname = getNickname(token);
         String role = getRole(token);
-        UserDetails userDetails = new CustomUserDetails(email, role);
+        UserDetails userDetails = new CustomUserDetails(nickname, role);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

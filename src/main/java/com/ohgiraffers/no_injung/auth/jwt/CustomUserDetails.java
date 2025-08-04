@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private final String email;
+    private final String nickname;
     private final String role;
 
-    public CustomUserDetails(String email, String role) {
-        this.email = email;
+    public CustomUserDetails(String nickname, String role) {
+        this.nickname = nickname;
         this.role = role;
     }
 
@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return nickname;
     }
 
     @Override

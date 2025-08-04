@@ -4,6 +4,7 @@ import com.ohgiraffers.no_injung.user.entity.Role;
 import com.ohgiraffers.no_injung.user.entity.User;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -18,8 +19,8 @@ import java.time.LocalDateTime;
 public class UserResponseDTO {
     
     private Long userId;
-    private String email;
     private String nickname;
+    private LocalDate birthDate;
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -28,8 +29,8 @@ public class UserResponseDTO {
     public static UserResponseDTO fromEntity(User user) {
         return UserResponseDTO.builder()
                 .userId(user.getUserId())
-                .email(user.getEmail())
                 .nickname(user.getNickname())
+                .birthDate(user.getBirthDate())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
