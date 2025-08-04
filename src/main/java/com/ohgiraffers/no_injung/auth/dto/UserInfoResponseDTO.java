@@ -15,6 +15,6 @@ public class UserInfoResponseDTO {
     private String id;
 
     public UserInfoResponseDTO(User user) {
-        this.id = user.getNickname();
+        this.id = user.getId();
     }
 }

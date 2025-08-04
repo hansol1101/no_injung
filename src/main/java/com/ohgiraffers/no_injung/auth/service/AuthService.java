@@ -39,7 +39,7 @@ public class AuthService {
         log.info("=== 회원가입 시작: {} ===", request.getId());
 
         // 1. 아이디 중복 검증 (논리삭제된 사용자 제외)
-        if (userRepository.existsByNicknameAndIsDeletedFalse(request.getId())) {
+        if (userRepository.existsByIdAndIsDeletedFalse(request.getId())) {
             log.warn("회원가입 실패 - 아이디 중복: {}", request.getId());
             throw new RuntimeException("이미 사용 중인 아이디입니다: " + request.getId());
         }
@@ -49,7 +49,7 @@ public class AuthService {
 
         // 3. 사용자 엔티티 생성
         User user = User.builder()
-                .nickname(request.getId())
+                .id(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .birthDate(request.getBirthdate())
                 .role(Role.USER) // 기본 권한은 USER
@@ -58,7 +58,7 @@ public class AuthService {
         try {
             User savedUser = userRepository.save(user);
             log.info("회원가입 성공: ID={}, 아이디={}",
-                    savedUser.getUserId(), savedUser.getNickname());
+                    savedUser.getUserId(), savedUser.getId());
         } catch (Exception e) {
             log.error("회원가입 실패 - DB 저장 오류: {}", e.getMessage(), e);
             throw new RuntimeException("회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -77,7 +77,7 @@ public class AuthService {
         log.info("=== 로그인 시도: {} ===", request.getId());
 
         // 1. 사용자 조회 (논리삭제되지 않은 사용자만)
-        User user = userRepository.findByNicknameAndIsDeletedFalse(request.getId())
+        User user = userRepository.findByIdAndIsDeletedFalse(request.getId())
                 .orElseThrow(() -> {
                     log.warn("로그인 실패 - 사용자 없음: {}", request.getId());
                     return new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
@@ -90,12 +90,12 @@ public class AuthService {
         }
 
         // 3. JWT 토큰 생성 (Role 정보 포함)
-        String token = jwtTokenProvider.createToken(user.getNickname());
+        String token = jwtTokenProvider.createToken(user.getId());
 
         log.info("로그인 성공: ID={}, 아이디={}, 권한={}",
-                user.getUserId(), user.getNickname(), user.getRole());
+                user.getUserId(), user.getId(), user.getRole());
 
-        return new AuthResponse(token, user.getNickname(), user.getRole().name());
+        return new AuthResponse(token, user.getId(), user.getRole().name());
     }
 
     /**
@@ -138,7 +138,7 @@ public class AuthService {
         if (id == null || id.trim().isEmpty()) {
             return false;
         }
-        return !userRepository.existsByNicknameAndIsDeletedFalse(id.trim());
+        return !userRepository.existsByIdAndIsDeletedFalse(id.trim());
     }
 
     /**
@@ -146,6 +146,6 @@ public class AuthService {
      * JWT 필터에서 활용 가능
      */
     public boolean isUserActive(String id) {
-        return userRepository.findByNicknameAndIsDeletedFalse(id).isPresent();
+        return userRepository.findByIdAndIsDeletedFalse(id).isPresent();
     }
 }
